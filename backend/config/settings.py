@@ -42,6 +42,11 @@ INSTALLED_APPS = [
     'projects.apps.ProjectsConfig',
     'issues.apps.IssuesConfig',
     'messaging.apps.MessagingConfig',
+    'meetings.apps.MeetingsConfig',
+    'approvals.apps.ApprovalsConfig',
+    'documents.apps.DocumentsConfig',
+    'files.apps.FilesConfig',
+    'notifications.apps.NotificationsConfig',
 ]
 
 MIDDLEWARE = [
