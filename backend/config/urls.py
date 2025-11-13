@@ -25,8 +25,8 @@ urlpatterns = [
     # API Endpoints
     path('api/', include('users.urls')),
     path('api/', include('workspaces.urls')),
-    # path('api/', include('projects.urls')),     # TODO: Create project URLs
-    # path('api/', include('issues.urls')),       # TODO: Create issue URLs
+    path('api/', include('projects.urls')),
+    path('api/', include('issues.urls')),
     # path('api/', include('messaging.urls')),    # TODO: Create messaging URLs
 ]
 
