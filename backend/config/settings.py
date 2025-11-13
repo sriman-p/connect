@@ -47,6 +47,14 @@ INSTALLED_APPS = [
     'documents.apps.DocumentsConfig',
     'files.apps.FilesConfig',
     'notifications.apps.NotificationsConfig',
+    'analytics.apps.AnalyticsConfig',
+    'timetracking.apps.TimetrackingConfig',
+    'goals.apps.GoalsConfig',
+    'knowledge.apps.KnowledgeConfig',
+    'forms.apps.FormsConfig',
+    'automations.apps.AutomationsConfig',
+    'search.apps.SearchConfig',
+    'integrations.apps.IntegrationsConfig',
 ]
 
 MIDDLEWARE = [
