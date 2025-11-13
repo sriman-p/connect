@@ -1,0 +1,92 @@
+# Django Core
+Django==5.1.4
+djangorestframework==3.15.2
+django-cors-headers==4.6.0
+django-filter==24.3
+
+# Database
+psycopg2-binary==2.9.10
+dj-database-url==2.3.0
+
+# Authentication & Security
+djangorestframework-simplejwt==5.4.0
+django-allauth==65.7.0
+python-jose[cryptography]==3.3.0
+passlib==1.7.4
+argon2-cffi==23.1.0
+
+# Async & WebSockets
+channels==4.2.0
+channels-redis==4.2.1
+daphne==4.2.1
+
+# Caching
+django-redis==5.4.0
+redis==5.2.1
+hiredis==3.1.0
+
+# Task Queue
+celery==5.4.0
+kombu==5.4.2
+
+# API Documentation
+drf-spectacular==0.27.2
+drf-yasg==1.21.8
+
+# File Storage
+boto3==1.35.95
+django-storages==1.14.4
+Pillow==11.1.0
+
+# Utilities
+python-dotenv==1.0.1
+python-decouple==3.8
+pytz==2024.2
+python-dateutil==2.9.0.post0
+
+# GraphQL (Optional)
+graphene-django==3.2.3
+
+# Validation
+pydantic==2.10.5
+marshmallow==3.23.2
+
+# Monitoring & Logging
+sentry-sdk==2.20.0
+django-extensions==3.2.3
+
+# Testing
+pytest==8.3.4
+pytest-django==4.9.0
+pytest-cov==6.0.0
+pytest-asyncio==0.25.2
+factory-boy==3.3.1
+faker==34.0.1
+
+# Code Quality
+black==25.1.0
+flake8==7.1.1
+isort==5.13.2
+mypy==1.14.1
+django-stubs==5.1.1
+
+# Performance
+gunicorn==23.0.0
+gevent==24.11.1
+whitenoise==6.8.2
+
+# Rate Limiting
+django-ratelimit==4.1.0
+
+# Social Auth
+social-auth-app-django==5.5.0
+
+# Email
+django-ses==4.2.0
+
+# Websocket
+websockets==14.2
+
+# Development
+ipython==8.31.0
+django-debug-toolbar==5.0.0
