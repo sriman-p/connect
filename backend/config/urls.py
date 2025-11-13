@@ -27,7 +27,7 @@ urlpatterns = [
     path('api/', include('workspaces.urls')),
     path('api/', include('projects.urls')),
     path('api/', include('issues.urls')),
-    # path('api/', include('messaging.urls')),    # TODO: Create messaging URLs
+    path('api/', include('messaging.urls')),
 ]
 
 # Serve media files in development
