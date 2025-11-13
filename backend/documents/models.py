@@ -289,3 +289,91 @@ class DocumentTemplate(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class DocumentSession(models.Model):
+    """Active editing session for real-time collaboration."""
+
+    document = models.ForeignKey(
+        Document,
+        on_delete=models.CASCADE,
+        related_name='active_sessions'
+    )
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    # Session tracking
+    session_id = models.CharField(max_length=100, unique=True)
+    is_active = models.BooleanField(default=True)
+
+    # Cursor position (for showing other users' cursors)
+    cursor_position = models.JSONField(null=True, blank=True)  # {line, column, selection}
+
+    # Current selection
+    selection_range = models.JSONField(null=True, blank=True)  # {from, to}
+
+    # User color for cursor/selection display
+    user_color = models.CharField(max_length=7)  # Hex color
+
+    # Metadata
+    joined_at = models.DateTimeField(auto_now_add=True)
+    last_activity_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-last_activity_at']
+        indexes = [
+            models.Index(fields=['document', 'is_active']),
+        ]
+
+    def __str__(self):
+        return f"{self.user.email} editing {self.document.title}"
+
+
+class DocumentOperation(models.Model):
+    """Operational transformation log for real-time collaboration."""
+
+    document = models.ForeignKey(
+        Document,
+        on_delete=models.CASCADE,
+        related_name='operations'
+    )
+
+    session = models.ForeignKey(
+        DocumentSession,
+        on_delete=models.CASCADE,
+        related_name='operations'
+    )
+
+    # Operation details (for OT/CRDT)
+    operation_type = models.CharField(
+        max_length=20,
+        choices=[
+            ('insert', 'Insert'),
+            ('delete', 'Delete'),
+            ('replace', 'Replace'),
+            ('format', 'Format'),
+        ]
+    )
+
+    # Operation data
+    operation_data = models.JSONField()  # {position, content, attributes}
+
+    # Version control
+    base_version = models.IntegerField()  # Document version when operation was created
+    sequence_number = models.IntegerField()  # For ordering operations
+
+    # Acknowledgment
+    is_acknowledged = models.BooleanField(default=False)
+    acknowledged_at = models.DateTimeField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['created_at', 'sequence_number']
+        indexes = [
+            models.Index(fields=['document', 'created_at']),
+            models.Index(fields=['session', 'sequence_number']),
+        ]
+
+    def __str__(self):
+        return f"{self.operation_type} by {self.session.user.email}"

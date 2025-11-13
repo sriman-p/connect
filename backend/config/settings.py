@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'meetings.apps.MeetingsConfig',
     'approvals.apps.ApprovalsConfig',
     'documents.apps.DocumentsConfig',
+    'spreadsheets.apps.SpreadsheetsConfig',
     'files.apps.FilesConfig',
     'notifications.apps.NotificationsConfig',
     'analytics.apps.AnalyticsConfig',

@@ -64,6 +64,7 @@ class File(models.Model):
     shared_with = models.ManyToManyField(
         User,
         through='FileShare',
+        through_fields=('file', 'user'),
         related_name='shared_files'
     )
 
