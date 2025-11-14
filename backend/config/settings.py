@@ -56,6 +56,8 @@ INSTALLED_APPS = [
     'automations.apps.AutomationsConfig',
     'search.apps.SearchConfig',
     'integrations.apps.IntegrationsConfig',
+    'ai.apps.AiConfig',
+    'video.apps.VideoConfig',
 ]
 
 MIDDLEWARE = [
@@ -282,3 +284,54 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+
+# Advanced i18n Settings
+from django.utils.translation import gettext_lazy as _
+
+LANGUAGES = [
+    ('en', _('English')),
+    ('es', _('Spanish')),
+    ('fr', _('French')),
+    ('de', _('German')),
+    ('ja', _('Japanese')),
+    ('zh-hans', _('Simplified Chinese')),
+]
+
+LOCALE_PATHS = [BASE_DIR / 'locale']
+
+# Elasticsearch Configuration
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': os.getenv('ELASTICSEARCH_URL', 'localhost:9200')
+    },
+}
+
+# AI/OpenAI Configuration
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
+OPENAI_MODEL = os.getenv('OPENAI_MODEL', 'gpt-4')
+
+# Video Conferencing
+VIDEO_CONF_PROVIDER = os.getenv('VIDEO_CONF_PROVIDER', 'jitsi')  # jitsi, zoom, webrtc
+JITSI_DOMAIN = os.getenv('JITSI_DOMAIN', 'meet.jit.si')
+
+# SSO/SAML Configuration
+SAML_ENABLED = os.getenv('SAML_ENABLED', 'False') == 'True'
+SAML_IDP_ENTITY_ID = os.getenv('SAML_IDP_ENTITY_ID', '')
+SAML_IDP_SSO_URL = os.getenv('SAML_IDP_SSO_URL', '')
+SAML_IDP_X509_CERT = os.getenv('SAML_IDP_X509_CERT', '')
+SAML_SP_ENTITY_ID = os.getenv('SAML_SP_ENTITY_ID', 'connect')
+SAML_SP_ACS_URL = os.getenv('SAML_SP_ACS_URL', 'http://localhost:8000/auth/saml/acs/')
+
+# OAuth2 Social Auth
+SOCIAL_AUTH_GITHUB_KEY = os.getenv('GITHUB_CLIENT_ID', '')
+SOCIAL_AUTH_GITHUB_SECRET = os.getenv('GITHUB_CLIENT_SECRET', '')
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv('GOOGLE_CLIENT_ID', '')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv('GOOGLE_CLIENT_SECRET', '')
+
+# Webhook Settings
+WEBHOOK_SECRET_KEY = os.getenv('WEBHOOK_SECRET_KEY', SECRET_KEY)
+WEBHOOK_TIMEOUT_SECONDS = 30
+
+# Analytics
+ANALYTICS_ENABLED = os.getenv('ANALYTICS_ENABLED', 'True') == 'True'
+ANALYTICS_RETENTION_DAYS = int(os.getenv('ANALYTICS_RETENTION_DAYS', 90))

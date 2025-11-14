@@ -1,259 +1,83 @@
 """
 Analytics Models
-Advanced analytics, reporting, and business intelligence
+Track usage metrics and generate insights
 """
 
 from django.db import models
-from django.contrib.postgres.fields import ArrayField
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from users.models import User
 from workspaces.models import Workspace
-from projects.models import Project
 
 
-class Dashboard(models.Model):
-    """Custom analytics dashboard."""
+class AnalyticsEvent(models.Model):
+    """Track user events for analytics."""
 
-    workspace = models.ForeignKey(
-        Workspace,
-        on_delete=models.CASCADE,
-        related_name='dashboards'
-    )
-
-    name = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
-
-    # Dashboard configuration (widgets, layout, etc.)
-    config = models.JSONField(default=dict)
-
-    # Permissions
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
-    is_public = models.BooleanField(default=False)
-    shared_with = models.ManyToManyField(User, related_name='shared_dashboards', blank=True)
-
-    # Default dashboard for workspace
-    is_default = models.BooleanField(default=False)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ['-created_at']
-        indexes = [
-            models.Index(fields=['workspace', 'is_default']),
-        ]
-
-    def __str__(self):
-        return self.name
-
-
-class Widget(models.Model):
-    """Dashboard widget."""
-
-    WIDGET_TYPE_CHOICES = [
-        ('chart', 'Chart'),
-        ('table', 'Table'),
-        ('metric', 'Metric'),
-        ('list', 'List'),
-        ('calendar', 'Calendar'),
-        ('timeline', 'Timeline'),
-        ('funnel', 'Funnel'),
-        ('gauge', 'Gauge'),
+    EVENT_TYPES = [
+        ('page_view', 'Page View'),
+        ('feature_usage', 'Feature Usage'),
+        ('api_call', 'API Call'),
+        ('search', 'Search'),
+        ('document_edit', 'Document Edit'),
+        ('issue_create', 'Issue Create'),
+        ('meeting_join', 'Meeting Join'),
+        ('file_upload', 'File Upload'),
+        ('approval_action', 'Approval Action'),
     ]
 
-    CHART_TYPE_CHOICES = [
-        ('line', 'Line Chart'),
-        ('bar', 'Bar Chart'),
-        ('pie', 'Pie Chart'),
-        ('area', 'Area Chart'),
-        ('scatter', 'Scatter Plot'),
-        ('heatmap', 'Heatmap'),
-    ]
+    workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, related_name='analytics_events')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    event_type = models.CharField(max_length=50, choices=EVENT_TYPES, db_index=True)
+    event_name = models.CharField(max_length=200)
 
-    dashboard = models.ForeignKey(
-        Dashboard,
-        on_delete=models.CASCADE,
-        related_name='widgets'
-    )
+    # Generic relation to any object
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True, blank=True)
+    object_id = models.PositiveIntegerField(null=True, blank=True)
+    content_object = GenericForeignKey('content_type', 'object_id')
 
-    title = models.CharField(max_length=100)
-    widget_type = models.CharField(max_length=20, choices=WIDGET_TYPE_CHOICES)
-    chart_type = models.CharField(max_length=20, choices=CHART_TYPE_CHOICES, blank=True)
-
-    # Widget configuration and data source
-    config = models.JSONField(default=dict)
-    data_source = models.CharField(max_length=100)  # e.g., 'issues', 'projects'
-    filters = models.JSONField(default=dict)
-
-    # Position and size on dashboard
-    position_x = models.IntegerField(default=0)
-    position_y = models.IntegerField(default=0)
-    width = models.IntegerField(default=4)
-    height = models.IntegerField(default=3)
-
-    # Refresh settings
-    auto_refresh = models.BooleanField(default=False)
-    refresh_interval_seconds = models.IntegerField(default=300)  # 5 minutes
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ['position_y', 'position_x']
-
-    def __str__(self):
-        return f"{self.title} ({self.widget_type})"
-
-
-class Report(models.Model):
-    """Custom report."""
-
-    REPORT_TYPE_CHOICES = [
-        ('project_summary', 'Project Summary'),
-        ('team_performance', 'Team Performance'),
-        ('time_analysis', 'Time Analysis'),
-        ('velocity', 'Velocity Report'),
-        ('burndown', 'Burndown Chart'),
-        ('budget', 'Budget Report'),
-        ('custom', 'Custom Report'),
-    ]
-
-    workspace = models.ForeignKey(
-        Workspace,
-        on_delete=models.CASCADE,
-        related_name='reports'
-    )
-
-    project = models.ForeignKey(
-        Project,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='reports'
-    )
-
-    name = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
-    report_type = models.CharField(max_length=30, choices=REPORT_TYPE_CHOICES)
-
-    # Report configuration
-    config = models.JSONField(default=dict)
-    filters = models.JSONField(default=dict)
-
-    # Date range
-    date_from = models.DateField(null=True, blank=True)
-    date_to = models.DateField(null=True, blank=True)
-
-    # Scheduling
-    is_scheduled = models.BooleanField(default=False)
-    schedule_frequency = models.CharField(
-        max_length=20,
-        choices=[
-            ('daily', 'Daily'),
-            ('weekly', 'Weekly'),
-            ('monthly', 'Monthly'),
-            ('quarterly', 'Quarterly'),
-        ],
-        blank=True
-    )
-    recipients = models.ManyToManyField(User, related_name='scheduled_reports', blank=True)
-
-    # Creator
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    last_generated_at = models.DateTimeField(null=True, blank=True)
-
-    class Meta:
-        ordering = ['-created_at']
-
-    def __str__(self):
-        return self.name
-
-
-class Metric(models.Model):
-    """Tracked metric/KPI."""
-
-    workspace = models.ForeignKey(
-        Workspace,
-        on_delete=models.CASCADE,
-        related_name='metrics'
-    )
-
-    project = models.ForeignKey(
-        Project,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='metrics'
-    )
-
-    name = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
-
-    # Metric type and calculation
-    metric_type = models.CharField(
-        max_length=50,
-        choices=[
-            ('count', 'Count'),
-            ('sum', 'Sum'),
-            ('average', 'Average'),
-            ('percentage', 'Percentage'),
-            ('custom', 'Custom Formula'),
-        ]
-    )
-
-    # Data source and calculation
-    data_source = models.CharField(max_length=100)
-    calculation_formula = models.TextField(blank=True)
-
-    # Target values
-    target_value = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
-    current_value = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-
-    # Unit (e.g., hours, dollars, issues)
-    unit = models.CharField(max_length=20, blank=True)
-
-    # Trend direction (higher or lower is better)
-    trend_direction = models.CharField(
-        max_length=10,
-        choices=[
-            ('up', 'Higher is Better'),
-            ('down', 'Lower is Better'),
-        ],
-        default='up'
-    )
-
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ['-created_at']
-
-    def __str__(self):
-        return self.name
-
-
-class MetricSnapshot(models.Model):
-    """Historical metric value snapshot."""
-
-    metric = models.ForeignKey(
-        Metric,
-        on_delete=models.CASCADE,
-        related_name='snapshots'
-    )
-
-    value = models.DecimalField(max_digits=12, decimal_places=2)
+    # Event metadata
     metadata = models.JSONField(default=dict, blank=True)
 
-    recorded_at = models.DateTimeField(auto_now_add=True)
+    # Context
+    session_id = models.CharField(max_length=100, db_index=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(blank=True)
+    referrer = models.URLField(blank=True, max_length=500)
+
+    # Performance
+    duration_ms = models.IntegerField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
 
     class Meta:
-        ordering = ['-recorded_at']
+        ordering = ['-created_at']
         indexes = [
-            models.Index(fields=['metric', 'recorded_at']),
+            models.Index(fields=['workspace', 'event_type', '-created_at']),
+            models.Index(fields=['user', '-created_at']),
+            models.Index(fields=['session_id']),
         ]
 
     def __str__(self):
-        return f"{self.metric.name}: {self.value} at {self.recorded_at}"
+        return f"{self.event_type} - {self.event_name}"
+
+
+class UsageMetric(models.Model):
+    """Aggregated usage metrics."""
+
+    workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, related_name='usage_metrics')
+    metric_type = models.CharField(max_length=50, db_index=True)
+    metric_name = models.CharField(max_length=200)
+    value = models.FloatField()
+    unit = models.CharField(max_length=50, blank=True)
+    date = models.DateField(db_index=True)
+    period_type = models.CharField(max_length=20)
+    breakdown = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-date']
+        unique_together = ['workspace', 'metric_type', 'date', 'period_type']
+
+    def __str__(self):
+        return f"{self.metric_name} - {self.date}"
