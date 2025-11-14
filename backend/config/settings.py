@@ -306,9 +306,11 @@ ELASTICSEARCH_DSL = {
     },
 }
 
-# AI/OpenAI Configuration
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
-OPENAI_MODEL = os.getenv('OPENAI_MODEL', 'gpt-4')
+# AI/Gemini Configuration (Google Gemini Free API)
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
+GEMINI_MODEL = os.getenv('GEMINI_MODEL', 'gemini-pro')
+AI_TEMPERATURE = float(os.getenv('AI_TEMPERATURE', '0.7'))
+AI_MAX_TOKENS = int(os.getenv('AI_MAX_TOKENS', '1000'))
 
 # Video Conferencing
 VIDEO_CONF_PROVIDER = os.getenv('VIDEO_CONF_PROVIDER', 'jitsi')  # jitsi, zoom, webrtc

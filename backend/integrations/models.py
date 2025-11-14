@@ -112,6 +112,88 @@ class APIKey(models.Model):
         return self.name
 
 
+class Webhook(models.Model):
+    """Webhook configuration for receiving events from integrations."""
+
+    integration = models.ForeignKey(
+        Integration,
+        on_delete=models.CASCADE,
+        related_name='webhooks'
+    )
+
+    # Webhook URL and secret
+    webhook_url = models.CharField(max_length=500)  # URL to receive webhooks
+    webhook_secret = models.CharField(max_length=255, blank=True)  # Secret for validation
+
+    # Events to subscribe to
+    events = models.JSONField(default=list)  # e.g., ['push', 'pull_request', 'issue']
+
+    # Status
+    is_active = models.BooleanField(default=True)
+
+    # Statistics
+    total_deliveries = models.IntegerField(default=0)
+    successful_deliveries = models.IntegerField(default=0)
+    failed_deliveries = models.IntegerField(default=0)
+    last_delivery_at = models.DateTimeField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Webhook for {self.integration.name}"
+
+
+class WebhookDelivery(models.Model):
+    """Track webhook delivery attempts."""
+
+    webhook = models.ForeignKey(
+        Webhook,
+        on_delete=models.CASCADE,
+        related_name='deliveries'
+    )
+
+    # Event details
+    event_type = models.CharField(max_length=100)
+    payload = models.JSONField(default=dict)
+
+    # Delivery status
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ('pending', 'Pending'),
+            ('success', 'Success'),
+            ('failed', 'Failed'),
+            ('retrying', 'Retrying'),
+        ],
+        default='pending'
+    )
+
+    # Response
+    status_code = models.IntegerField(null=True, blank=True)
+    response_body = models.TextField(blank=True)
+    error_message = models.TextField(blank=True)
+
+    # Metadata
+    attempt_count = models.IntegerField(default=0)
+    duration_ms = models.IntegerField(default=0)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    delivered_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['webhook', 'status', '-created_at']),
+        ]
+
+    def __str__(self):
+        return f"{self.event_type} - {self.status}"
+
+
 class IntegrationLog(models.Model):
     """Integration activity log."""
 
