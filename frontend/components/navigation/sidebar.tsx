@@ -16,7 +16,9 @@ const navigation: NavItem[] = [
   { name: 'Issues', href: '/issues', icon: '📋' },
   { name: 'Documents', href: '/documents', icon: '📄' },
   { name: 'Spreadsheets', href: '/spreadsheets', icon: '📊' },
+  { name: 'Files', href: '/files', icon: '📎' },
   { name: 'Meetings', href: '/meetings', icon: '📅' },
+  { name: 'Approvals', href: '/approvals', icon: '✅' },
   { name: 'Messages', href: '/dashboard/messages', icon: '💬' },
 ];
 

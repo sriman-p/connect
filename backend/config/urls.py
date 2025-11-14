@@ -30,6 +30,9 @@ urlpatterns = [
     path('api/', include('messaging.urls')),
     path('api/', include('documents.urls')),
     path('api/', include('spreadsheets.urls')),
+    path('api/', include('meetings.urls')),
+    path('api/', include('approvals.urls')),
+    path('api/', include('files.urls')),
 ]
 
 # Serve media files in development
