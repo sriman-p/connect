@@ -3,7 +3,8 @@
 import { motion } from 'framer-motion';
 import { ReactNode, ButtonHTMLAttributes } from 'react';
 
-interface AnimatedButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface AnimatedButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>,
+  'onAnimationStart' | 'onAnimationEnd' | 'onDrag' | 'onDragStart' | 'onDragEnd'> {
   children: ReactNode;
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
@@ -48,7 +49,7 @@ export function AnimatedIconButton({
   children,
   className = '',
   ...props
-}: ButtonHTMLAttributes<HTMLButtonElement> & { children: ReactNode }) {
+}: Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onAnimationStart' | 'onAnimationEnd' | 'onDrag' | 'onDragStart' | 'onDragEnd'> & { children: ReactNode }) {
   return (
     <motion.button
       whileHover={{ scale: 1.1 }}
@@ -66,7 +67,7 @@ export function FloatingActionButton({
   children,
   className = '',
   ...props
-}: ButtonHTMLAttributes<HTMLButtonElement> & { children: ReactNode }) {
+}: Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onAnimationStart' | 'onAnimationEnd' | 'onDrag' | 'onDragStart' | 'onDragEnd'> & { children: ReactNode }) {
   return (
     <motion.button
       initial={{ scale: 0, opacity: 0 }}

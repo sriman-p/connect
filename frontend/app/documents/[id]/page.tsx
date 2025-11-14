@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { apiClient } from '@/lib/api/client';
+import apiClient from '@/lib/api/client';
 import CollaborativeEditor from '@/components/documents/collaborative-editor';
 import PageTransition from '@/components/animations/page-transition';
 import AnimatedButton, { AnimatedIconButton } from '@/components/animations/animated-button';
