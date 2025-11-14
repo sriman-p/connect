@@ -2,6 +2,7 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
+from .models import PasskeyCredential, PasskeyAuthenticationAttempt, PasskeyRegistrationSession
 
 User = get_user_model()
 
@@ -197,3 +198,75 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
                 'new_password_confirm': 'Passwords do not match.'
             })
         return attrs
+
+
+class PasskeyCredentialSerializer(serializers.ModelSerializer):
+    """Serializer for passkey credentials."""
+
+    class Meta:
+        model = PasskeyCredential
+        fields = [
+            'id', 'credential_id', 'name', 'authenticator_type',
+            'is_active', 'is_backup_eligible', 'is_backup_state',
+            'device_name', 'usage_count', 'last_used_at',
+            'created_at'
+        ]
+        read_only_fields = [
+            'credential_id', 'usage_count', 'last_used_at', 'created_at'
+        ]
+
+
+class PasskeyRegistrationInitSerializer(serializers.Serializer):
+    """Serializer for initiating passkey registration."""
+
+    name = serializers.CharField(
+        max_length=100,
+        help_text='User-friendly name for the passkey (e.g., "iPhone Touch ID")'
+    )
+
+
+class PasskeyRegistrationCompleteSerializer(serializers.Serializer):
+    """Serializer for completing passkey registration."""
+
+    credential_id = serializers.CharField(max_length=500)
+    public_key = serializers.CharField()
+    challenge = serializers.CharField(max_length=500)
+    attestation_data = serializers.JSONField(required=False)
+    authenticator_type = serializers.ChoiceField(
+        choices=['platform', 'cross_platform'],
+        default='platform'
+    )
+    transports = serializers.ListField(
+        child=serializers.CharField(),
+        required=False,
+        default=list
+    )
+    device_name = serializers.CharField(max_length=200, required=False, allow_blank=True)
+
+
+class PasskeyAuthenticationInitSerializer(serializers.Serializer):
+    """Serializer for initiating passkey authentication."""
+
+    email = serializers.EmailField(required=False)
+
+
+class PasskeyAuthenticationCompleteSerializer(serializers.Serializer):
+    """Serializer for completing passkey authentication."""
+
+    credential_id = serializers.CharField(max_length=500)
+    challenge = serializers.CharField(max_length=500)
+    authenticator_data = serializers.CharField()
+    client_data_json = serializers.CharField()
+    signature = serializers.CharField()
+
+
+class PasskeyAuthenticationAttemptSerializer(serializers.ModelSerializer):
+    """Serializer for passkey authentication attempts."""
+
+    class Meta:
+        model = PasskeyAuthenticationAttempt
+        fields = [
+            'id', 'status', 'user_agent', 'ip_address',
+            'country_code', 'city', 'attempted_at'
+        ]
+        read_only_fields = fields

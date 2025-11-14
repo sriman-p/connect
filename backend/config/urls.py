@@ -28,6 +28,8 @@ urlpatterns = [
     path('api/', include('projects.urls')),
     path('api/', include('issues.urls')),
     path('api/', include('messaging.urls')),
+    path('api/', include('documents.urls')),
+    path('api/', include('spreadsheets.urls')),
 ]
 
 # Serve media files in development
