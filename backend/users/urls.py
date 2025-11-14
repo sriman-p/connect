@@ -10,6 +10,12 @@ from .views import (
     PasswordResetRequestView,
     PasswordResetConfirmView,
     health_check,
+    PasskeyRegistrationInitView,
+    PasskeyRegistrationCompleteView,
+    PasskeyAuthenticationInitView,
+    PasskeyAuthenticationCompleteView,
+    PasskeyCredentialListView,
+    PasskeyCredentialDeleteView,
 )
 
 app_name = 'users'
@@ -34,4 +40,12 @@ urlpatterns = [
 
     # Email
     path('auth/email/verify/', EmailVerificationView.as_view(), name='email-verify'),
+
+    # Passkey Authentication
+    path('auth/passkey/register/init/', PasskeyRegistrationInitView.as_view(), name='passkey-register-init'),
+    path('auth/passkey/register/complete/', PasskeyRegistrationCompleteView.as_view(), name='passkey-register-complete'),
+    path('auth/passkey/authenticate/init/', PasskeyAuthenticationInitView.as_view(), name='passkey-auth-init'),
+    path('auth/passkey/authenticate/complete/', PasskeyAuthenticationCompleteView.as_view(), name='passkey-auth-complete'),
+    path('auth/passkey/credentials/', PasskeyCredentialListView.as_view(), name='passkey-credentials'),
+    path('auth/passkey/credentials/<int:pk>/', PasskeyCredentialDeleteView.as_view(), name='passkey-credential-delete'),
 ]
